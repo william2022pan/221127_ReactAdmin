@@ -1,8 +1,12 @@
 import React, { Component } from 'react'
-import { Form, Icon, Input, Button } from 'antd';
+import { Form, Icon, Input, Button, message } from 'antd';
 
 import './login.less'
-import logo from './images/logo.png'
+import logo from '../../assets/images/logo.png'
+import { reqLogin } from '../../api'
+import memoryUtils from '../../utils/memoryUtils'
+import storageUtils from '../../utils/storageUtils'
+import { Redirect } from 'react-router-dom';
 
 const Item = Form.Item
 
@@ -10,9 +14,26 @@ class Login extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault()
-    this.props.form.validateFields((err, values) => {
+    this.props.form.validateFields(async (err, values) => {
       if (!err) {
-        console.log('提交登陆的ajax请求', values);
+        // console.log('提交登陆的ajax请求', values);
+        const {username, password} = values     
+        const result = await reqLogin(username, password)
+        // console.log('请求成功',result);
+        // const result = response.data
+        if (result.status === 0) {
+          message.success('登陆成功')
+
+          const user = result.data
+          memoryUtils.user = user
+          storageUtils.saveUser(user)
+
+          this.props.history.replace('/')
+        } else {
+          message.error(result.msg)
+        }
+
+
       } else {
         console.log('检验失败');
       }
@@ -24,7 +45,6 @@ class Login extends Component {
   }
 
   validatePwd = (rule, value, callback) => {
-    console.log('validatePwd()', rule, value);
     if (!value) {
       callback('密码必须输入')
     } else if (value.length < 4) {
@@ -39,6 +59,11 @@ class Login extends Component {
   }
 
   render() {
+
+    const user = memoryUtils.user
+    if (user && user._id) {
+      return <Redirect to='/' />
+    }
 
     const form = this.props.form;
     const { getFieldDecorator } = form;
