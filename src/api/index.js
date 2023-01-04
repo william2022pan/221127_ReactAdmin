@@ -36,3 +36,9 @@ export const reqWeather = () => {
       })
   })
 }
+
+export const reqCategorys = (parentId) => ajax(BASE + '/manage/category/list', { parentId })
+
+export const reqAddCategory = (categoryName, parentId) => ajax(BASE + '/manage/category/add', {categoryName, parentId}, 'POST')
+
+export const reqUpdateCategory = ({categoryId, categoryName}) => ajax(BASE + '/manage/category/update', {categoryId, categoryName}, 'POST')

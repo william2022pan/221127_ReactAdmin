@@ -86,7 +86,6 @@ class LeftNav extends Component {
   render() {
     // debugger
     const path = this.props.location.pathname;
-    console.log('path: ', path);
     const openKey = this.openKey
 
     return (
