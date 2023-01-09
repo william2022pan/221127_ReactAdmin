@@ -35,9 +35,9 @@ export default class Category extends Component {
     ];
   }
 
-  getCategorys = async () => {
+  getCategorys = async (parentId) => {
     this.setState({ loading: true })
-    const {parentId} = this.state
+    parentId = parentId || this.state.parentId
     const result = await reqCategorys(parentId)
     this.setState({loading: false})
     if (result.status === 0) {
@@ -89,6 +89,25 @@ export default class Category extends Component {
   addCategory = () => {
     console.log('addCategory()');
 
+    this.form.validateFields(async(err, values) => {
+      if (!err) {
+        this.setState({
+          showStatus: 0
+        })
+    
+        const { parentId, categoryName } = values
+        this.form.resetFields()
+        
+        const result = await reqAddCategory(categoryName, parentId)
+        if (result.status === 0) {
+          if (parentId === this.state.parentId) {
+            this.getCategorys()
+          } else if (parentId === '0') {
+            this.getCategorys('0')
+          }     
+        }
+      }
+    })
   }
 
   showUpdate = (category) => {
@@ -98,20 +117,26 @@ export default class Category extends Component {
     })
   }
 
-  updateCategory = async() => {
+  updateCategory = () => {
     console.log('updateCategory()');
-    this.setState({
-      showStatus: 0
+    this.form.validateFields(async(err, values) => {
+      if (!err) {
+        this.setState({
+          showStatus: 0
+        })
+    
+        const categoryId = this.category._id
+        const { categoryName } = values
+        this.form.resetFields()
+    
+        const result = await reqUpdateCategory({ categoryId, categoryName })
+        if (result.status === 0) {
+          this.getCategorys()
+        }
+      }
     })
 
-    const categoryId = this.category._id
-    const categoryName = this.form.getFieldValue('categoryName')
-    this.form.resetFields()
 
-    const result = await reqUpdateCategory({ categoryId, categoryName })
-    if (result.status === 0) {
-      this.getCategorys()
-    }
 
   }
 
@@ -150,7 +175,7 @@ export default class Category extends Component {
           loading = {loading}
           dataSource={parentId === '0' ? categorys : subCategorys}
           columns={this.columns}
-          pagination={{ defaultPageSize: 2, showQuickJumper: true }} />
+          pagination={{ defaultPageSize: 5, showQuickJumper: true }} />
         
         <Modal
           title="添加分类"
@@ -158,7 +183,10 @@ export default class Category extends Component {
           onOk={this.addCategory}
           onCancel={this.handleCancel}
         >
-          <AddForm/>
+          <AddForm
+            categorys={categorys}
+            parentId={parentId}
+            setForm={(form) => { this.form = form }}/>
         </Modal>
 
         <Modal
