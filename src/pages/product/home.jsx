@@ -1,44 +1,19 @@
 import React, { Component } from 'react'
 import { Card, Select, Input, Button, Icon, Table } from 'antd'
 import LinkButton from '../../components/link-button'
+import { reqProducts, reqSearchProducts } from '../../api'
+import {PAGE_SIZE} from '../../utils/constants'
 
 const Option = Select.Option
 
 export default class ProductHome extends Component {
 
   state = {
-    products: [
-        {
-          "status": 1,
-          "imgs": [
-              "image-1673345611050.png",
-              "image-1673345613808.png"
-          ],
-          "_id": "63bd3aa5ef2fcb1f04b498b0",
-          "name": "Xiaomi Buds 4",
-          "desc": "半入耳舒适降噪\n舒适与静谧兼得\nHiFi音质，纯享天籁之音\n独立空间音频\n跨设备自由感受立体听感",
-          "price": 239,
-          "detail": "<p>基本参数</p>\n<p>产品形态：半入耳式真无线蓝牙耳机</p>\n<p>产品颜色：盐湖白 / 月影黑 / 旷野绿</p>\n<p>产品型号：M2224E1</p>\n",
-          "pCategoryId": "63b4347115fc093878d0d7e4",
-          "categoryId": "63b434ce15fc093878d0d7e8",
-          "__v": 0
-      },
-      {
-          "status": 1,
-          "imgs": [
-              "image-1673346020531.png",
-              "image-1673346023346.jpg"
-          ],
-          "_id": "63bd3c43ef2fcb1f04b498b1",
-          "name": "小米电视ES75",
-          "desc": "多分区，画质轻旗舰",
-          "price": 4999,
-          "detail": "<p>星幕锐影多分区背光杜比视界ΔE≈2 原色屏MEMC 动态补偿金属全面屏远场语音控制2x12.5W四单元扬声器700nits高峰值亮度</p>\n",
-          "pCategoryId": "63b4347915fc093878d0d7e5",
-          "categoryId": "63bba06bdabec03670702f03",
-          "__v": 0
-      }
-    ]
+    total: 0,
+    products: [],
+    loading: false,
+    searchName: '',
+    searchType: 'productName'
   } 
 
   initColumns = () => {
@@ -85,22 +60,57 @@ export default class ProductHome extends Component {
     
   }
 
+  getProducts = async (pageNum) => {
+    this.setState({ loading: true })
+    const { searchName, searchType } = this.state
+    let result
+    if (searchName) {
+      result = await reqSearchProducts({pageNum, pageSize: PAGE_SIZE, searchName, searchType})
+    } else {
+      result = await reqProducts(pageNum, PAGE_SIZE)
+    }
+    console.log(pageNum, PAGE_SIZE, searchName, searchType);
+
+    this.setState({loading: false})
+    if (result.status === 0) {
+      const { total, list } = result.data
+      this.setState({
+        total,
+        products: list
+      })
+
+    }
+  }
+
   UNSAFE_componentWillMount() {
     this.initColumns()
   }
 
+  componentDidMount() {
+    this.getProducts(1)
+
+  }
+
   render() {
 
-   const {products} = this.state
+   const {products, total, loading, searchType, searchName} = this.state
 
     const title = (
       <span>
-        <Select value='1' style={{width: 150}}>
-          <Option value='1'>按名称搜索</Option>
-          <Option value='2'>按描述搜索</Option>
+        <Select
+          value={searchType} s
+          tyle={{ width: 150 }}
+          onChange={value => this.setState({ searchType: value })} >
+          <Option value='productName'>按名称搜索</Option>
+          <Option value='productDesc'>按描述搜索</Option>
         </Select>
-        <Input placeholder='关键字' style={{width: 200, margin: '0 15px' }} />
-        <Button type='primary'>搜索</Button>
+        <Input
+          placeholder='关键字'
+          style={{ width: 200, margin: '0 15px' }}
+          value={searchName}
+          onChange={event => this.setState({ searchName: event.target.value })}
+        />
+        <Button type='primary' onClick={() => this.getProducts(1)}>搜索</Button>
       </span>
     )
 
@@ -116,9 +126,16 @@ export default class ProductHome extends Component {
       <Card title={title} extra={extra} >
         <Table
           bordered
+          loading = {loading}
           rowKey='_id'
           dataSource={products}
           columns={this.columns}
+          pagination={{
+            total,
+            defaultPageSize: PAGE_SIZE,
+            showQuickJumper: true,
+            onChange: this.getProducts
+          }}
         />
       </Card>
     )
