@@ -54,3 +54,5 @@ export const reqSearchProducts = ({ pageNum, pageSize, searchName, searchType}) 
   pageSize,
   [searchType]: searchName
 })
+
+export const reqDeleteImg = (name) => ajax(BASE + '/manage/img/delete', {name}, 'POST')
