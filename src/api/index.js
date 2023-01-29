@@ -55,4 +55,8 @@ export const reqSearchProducts = ({ pageNum, pageSize, searchName, searchType}) 
   [searchType]: searchName
 })
 
-export const reqDeleteImg = (name) => ajax(BASE + '/manage/img/delete', {name}, 'POST')
+export const reqDeleteImg = (name) => ajax(BASE + '/manage/img/delete', { name }, 'POST')
+
+export const reqAddOrUpdateProduct = (product) => ajax(BASE + '/manage/product/' + (product._id ? 'update' : 'add'), product, 'POST')
+
+// export const reqUpdateProduct = (product) => ajax(BASE + '/manage/product/update', product, 'POST')

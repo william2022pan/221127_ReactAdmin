@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { Card, Form, Input, Cascader, Upload, Button, Icon } from 'antd'
+import { Card, Form, Input, Cascader, Upload, Button, Icon, message } from 'antd'
 import PicturesWall from './picuture-wall'
+import RichTextEditor from './rich-text-editor'
 import LinkButton from '../../components/link-button'
-import {reqCategorys} from '../../api'
+import {reqCategorys, reqAddOrUpdateProduct} from '../../api'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -17,6 +18,7 @@ class ProductAddUpdate extends Component {
     super(props)
 
     this.pw = React.createRef()
+    this.editor = React.createRef()
   }
 
   initOptions = async(categorys) => {
@@ -109,12 +111,32 @@ class ProductAddUpdate extends Component {
   }
 
   submit = () => {
-    this.props.form.validateFields((error, values) => {
+    this.props.form.validateFields(async(error, values) => {
       if (!error) {
-        console.log('submit(): ', values);
+        const { name, desc, price, categoryIds } = values
+        let pCategoryId, categoryId
+        if (categoryIds.length === 1) {
+          pCategoryId = '0'
+          categoryId = categoryIds[0]
+        } else {
+          pCategoryId = categoryIds[0]
+          categoryId = categoryIds[1]
+        }
         const imgs = this.pw.current.getImages()
-        console.log('imgs',imgs);
-        alert('发送ajax请求')
+        const detail = this.editor.current.getDetail()
+
+        const product = {name, desc, price, pCategoryId, categoryId, imgs, detail}
+        if (this.isUpdate) {
+          product._id = this.product._id
+        }
+
+        const result = await reqAddOrUpdateProduct(product)
+        if (result.status === 0) {
+          message.success(`${this.isUpdate ? '更新' : '添加'}商品成功!`)
+          this.props.history.goBack()
+        } else {
+          message.error(`${this.isUpdate ? '更新' : '添加'}商品失败!`)
+        }
       }
     })
   }
@@ -133,7 +155,7 @@ class ProductAddUpdate extends Component {
   render() {
 
     const { isUpdate, product } = this
-    const {pCategoryId, categoryId, imgs} = product 
+    const {pCategoryId, categoryId, imgs, detail} = product 
     const categoryIds = []
     if (isUpdate) {
       if (pCategoryId === '0') {
@@ -214,8 +236,8 @@ class ProductAddUpdate extends Component {
           <Item label="商品图片">
             <PicturesWall ref={this.pw} imgs={imgs} />
           </Item>
-          <Item label="商品详情">
-            <div> 商品详情</div>
+          <Item label="商品详情" labelCol={{span: 2}} wrapperCol={{span: 20}} >
+            <RichTextEditor ref={this.editor} detail={detail} />
           </Item>
           <Item>
             <Button type='primary' onClick={this.submit}>提交</Button>
