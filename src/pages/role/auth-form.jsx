@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import {
   Form,
@@ -54,7 +54,7 @@ const treeData = [
   },
 ];
 
-export default class AuthForm extends Component {
+export default class AuthForm extends PureComponent {
 
   static propTypes = {
     role: PropTypes.object

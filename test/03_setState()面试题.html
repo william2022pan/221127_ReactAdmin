@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>01_setState的使用</title>
+</head>
+<body>
+  <div id="example"></div>
+
+  <script type="text/javascript" src="./js/react.development.js"></script> 
+  <script type="text/javascript" src="./js/react-dom.development.js"></script>
+  <script type="text/javascript" src="./js/babel.min.js"></script>
+  <script src="https://cdn.bootcss.com/remarkable/1.7.1/remarkable.min.js"></script>
+
+  <script type="text/babel">
+
+  class StateTest extends React.Component {
+
+    state = {
+      count: 0
+    }
+
+    componentDidMount() {
+     this.setState({count: this.state.count + 1})
+     this.setState({count: this.state.count + 1})
+     console.log(this.state.count);
+
+     this.setState(state => ({count: state.count + 1}))
+     this.setState(state => ({count: state.count + 1}))
+     console.log(this.state.count);
+
+     setTimeout(() => {
+      this.setState({count: this.state.count + 1})
+      console.log('timeout', this.state.count)
+
+      this.setState({count: this.state.count + 1})
+      console.log('timeout', this.state.count)
+     }, 0)
+
+     Promise.resolve().then(value => {
+      this.setState({count: this.state.count + 1})
+      console.log('promise', this.state.count);
+
+      this.setState({count: this.state.count + 1})
+      console.log('promise', this.state.count);
+     })
+    }
+
+    render() {
+      const count = this.state.count
+      console.log('render', count);
+      return (
+        <div>
+          <p>{count}</p>
+        </div>
+      )      
+    }
+  }
+
+  ReactDOM.render(<StateTest/>, document.getElementById('example'))
+
+  </script>
+  
+</body>
+</html>

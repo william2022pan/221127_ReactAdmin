@@ -43,7 +43,8 @@ export default class Category extends Component {
     if (result.status === 0) {
       const categorys = result.data
       if (parentId === '0') {
-        this.setState({categorys})
+        this.setState({ categorys })
+        console.log('------', this.state.categorys.length);
       } else {
         this.setState({subCategorys: categorys})
       }

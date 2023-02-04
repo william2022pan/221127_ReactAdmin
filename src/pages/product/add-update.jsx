@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { Card, Form, Input, Cascader, Upload, Button, Icon, message } from 'antd'
 import PicturesWall from './picuture-wall'
 import RichTextEditor from './rich-text-editor'
@@ -8,7 +8,7 @@ import {reqCategorys, reqAddOrUpdateProduct} from '../../api'
 const { Item } = Form
 const { TextArea } = Input
 
-class ProductAddUpdate extends Component {
+class ProductAddUpdate extends PureComponent {
 
   state = {
     options: [],

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04_Component与PureComponent</title>
+</head>
+<body>
+  <div id="example"></div>
+
+  <script type="text/javascript" src="./js/react.development.js"></script> 
+  <script type="text/javascript" src="./js/react-dom.development.js"></script>
+  <script type="text/javascript" src="./js/babel.min.js"></script>
+  <script src="https://cdn.bootcss.com/remarkable/1.7.1/remarkable.min.js"></script>
+
+  <script type="text/babel">
+
+  class A extends React.Component {
+
+    state = {
+      m1: {count: 1}
+    }
+
+    test1 = () => {
+      // this.setState(state => ({
+      //   m1: {count: state.m1.count + 1}
+      // }))
+
+      // this.state.m1.count = 2
+      // this.setState({m1: this.state.m1})
+
+      const m1 = this.state.m1
+      m1.count = 2
+      // this.setState({m1})
+      this.setState({m1: {...m1}})
+
+      // this.setState({})
+    }
+
+    render() {
+      console.log('A render()')
+      return (
+        <div>
+          <h1>A组件： m1={this.state.m1.count}</h1>
+          <button onClick={this.test1}>A 测试1</button>
+          <B m1={this.state.m1}/>
+        </div>
+      )
+    }
+  }
+
+  class B extends React.PureComponent {
+
+    state = {
+      m2: 1
+    }
+
+    test2 = () => {
+      this.setState({})
+    }
+
+    // shouldComponentUpdate(nextProps, nextState) {
+    //   console.log('shouldComponentUpdate(): ', !(this.props.m1===nextProps.m1 && this.state.m2===nextState.m2));
+    //   if(this.props.m1===nextProps.m1 && this.state.m2===nextState.m2) {
+    //     return false
+    //   } else {
+    //     return true
+    //   }
+
+    //   // return true
+    // }
+
+    render() {
+      console.log('B render()')
+      return (
+        <div>
+          <h1>B组件： m2={this.state.m2}, m1.count={this.props.m1.count}</h1>
+          <button onClick={this.test2}>B 测试2</button>
+        </div>
+      )
+    }
+  }
+
+  ReactDOM.render(<A/>, document.getElementById('example'))
+
+  </script>
+  
+</body>
+</html>
