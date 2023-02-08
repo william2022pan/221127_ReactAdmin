@@ -5,7 +5,8 @@ import { reqRoles, reqAddRole, reqUpdateRole } from '../../api'
 import AddForm from './add-form'
 import AuthForm from './auth-form'
 import memoryUtils from '../../utils/memoryUtils'
-import {formateDate} from '../../utils/dateUtils'
+import { formateDate } from '../../utils/dateUtils'
+import storageUtils from '../../utils/storageUtils'
 
 export default class Role extends Component {
   
@@ -107,11 +108,18 @@ export default class Role extends Component {
 
     const result = await reqUpdateRole(role)
     if (result.status === 0) {
-      message.success('设置角色成功')
       // this.getRoles()
-      this.setState({
-        roles: [...this.state.roles]
-      })
+      if (role._id===memoryUtils.user.role_id) {
+        memoryUtils.user = {}
+        storageUtils.removeUser()
+        this.props.history.replace('/login')
+        message.success('当前用户角色权限修改了，请重新登陆')
+      } else {
+        message.success('设置角色成功')
+        this.setState({
+          roles: [...this.state.roles]
+        })
+      }
     }
   }
 

@@ -12,8 +12,6 @@ const BASE = ''
 
 export const reqLogin = (username, password) => ajax(BASE+'/login', { username, password }, 'POST')
 
-export const reqAddUser = (user) => ajax(BASE + '/manage/user/add', user, 'POST')
-
 export const reqWeather = () => {
   return new Promise((resolve, reject) => {
     // const url =`https://api.map.baidu.com/weather/v1/?district_id=310115&data_type=all&ak=vmMWBuYjf8qY7Au28ciOODxH9FZkyqId`
@@ -69,4 +67,8 @@ export const reqUpdateRole = (role) => ajax(BASE + '/manage/role/update', role, 
 
 export const reqUsers = () => ajax(BASE + '/manage/user/list')
 
-export const reqDeleteUser = (userId) => ajax(BASE + '/manage/user/delete', {userId}, 'POST')
+export const reqDeleteUser = (userId) => ajax(BASE + '/manage/user/delete', { userId }, 'POST')
+
+export const reqAddUser = (user) => ajax(BASE + '/manage/user/add', user, 'POST')
+
+export const reqAddOrUpdateUser = (user) => ajax(BASE + '/manage/user/'+(user._id ? 'update' : 'add'), user, 'POST')
