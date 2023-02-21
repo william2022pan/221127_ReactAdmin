@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
-import { Form, Icon, Input, Button, message } from 'antd';
+import { Form, Icon, Input, Button, message } from 'antd'
+import {connect} from 'react-redux'
 
 import './login.less'
 import logo from '../../assets/images/logo.png'
-import { reqLogin } from '../../api'
-import memoryUtils from '../../utils/memoryUtils'
-import storageUtils from '../../utils/storageUtils'
-import { Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom'
+import {login} from '../../redux/actions'
 
 const Item = Form.Item
 
@@ -17,23 +16,8 @@ class Login extends Component {
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
         // console.log('提交登陆的ajax请求', values);
-        const {username, password} = values     
-        const result = await reqLogin(username, password)
-        // console.log('请求成功',result);
-        // const result = response.data
-        if (result.status === 0) {
-          message.success('登陆成功')
-
-          const user = result.data
-          memoryUtils.user = user
-          storageUtils.saveUser(user)
-
-          this.props.history.replace('/home')
-        } else {
-          message.error(result.msg)
-        }
-
-
+        const { username, password } = values    
+        this.props.login(username, password)
       } else {
         console.log('检验失败');
       }
@@ -60,10 +44,12 @@ class Login extends Component {
 
   render() {
 
-    const user = memoryUtils.user
+    const user = this.props.user
     if (user && user._id) {
-      return <Redirect to='/' />
+      return <Redirect to='/home' />
     }
+
+    const errorMsg = this.props.user.errorMsg
 
     const form = this.props.form;
     const { getFieldDecorator } = form;
@@ -75,6 +61,7 @@ class Login extends Component {
           <h1>React项目：后台管理系统</h1>
         </header>
         <section className='login-content'>
+          <div className={errorMsg ? 'error-msg show' : 'error-msg'}>{errorMsg}</div>
           <h2>用户登陆</h2>
           <Form onSubmit={this.handleSubmit} className="login-form">
             <Item>
@@ -124,4 +111,7 @@ class Login extends Component {
 
 
 const WrapLogin = Form.create()(Login);
-export default WrapLogin
+export default connect(
+  state => ({user: state.user}),
+  {login}
+)(WrapLogin)
