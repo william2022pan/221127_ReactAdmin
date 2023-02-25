@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>06_context使用</title>
+</head>
+<body>
+
+  <div id="test"></div>
+
+  <script type="text/javascript" src="./js/react.development.js"></script> 
+  <script type="text/javascript" src="./js/react-dom.development.js"></script>
+  <script type="text/javascript" src="./js/prop-types.js"></script>
+  <script type="text/javascript" src="./js/babel.min.js"></script>
+
+  <script type="text/babel">
+    class A extends React.Component {
+      state = {
+        color: 'red'
+      }
+
+      static childContextTypes = {
+        color: PropTypes.string
+      }
+
+      getChildContext() {
+        return {color: this.state.color};
+      }
+
+      render () {
+        return (
+          <div>
+            <h2>A组件</h2>
+            <B />
+          </div>
+        )
+      }
+    }
+
+
+    class B extends React.Component {
+
+      constructor(props, context) {
+        super(props)
+
+        console.log('B', context.color);
+      }
+
+      render() {
+        return (
+          <div>
+            <h2>B组件: {this.context.color}</h2>
+            <C />
+          </div>
+        )
+      }
+    }
+
+
+    class C extends React.Component {
+      constructor(props, context) {
+        super(props)
+
+        console.log('C', context.color);
+      }
+
+      static contextTypes = {
+        color: PropTypes.string
+      }
+
+      render() {
+        return (
+          <div>
+            <h2 style={{color: this.context.color}}>C组件</h2>
+          </div>
+        )
+      }
+    }
+
+    ReactDOM.render(<A />, document.getElementById('test'))
+ 
+  </script>
+  
+</body>
+</html>
