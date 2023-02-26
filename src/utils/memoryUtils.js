@@ -1,5 +1,6 @@
 const user = {
-  user: {}
+  user: {},
+  product: {}
 }
 
 export default user

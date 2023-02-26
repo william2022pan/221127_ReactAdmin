@@ -3,7 +3,8 @@ import { Card, Form, Input, Cascader, Upload, Button, Icon, message } from 'antd
 import PicturesWall from './picuture-wall'
 import RichTextEditor from './rich-text-editor'
 import LinkButton from '../../components/link-button'
-import {reqCategorys, reqAddOrUpdateProduct} from '../../api'
+import { reqCategorys, reqAddOrUpdateProduct } from '../../api'
+import memoryUtils from '../../utils/memoryUtils'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -147,9 +148,13 @@ class ProductAddUpdate extends PureComponent {
   }
 
   UNSAFE_componentWillMount() {
-    const product = this.props.location.state
-    this.isUpdate = !!product
+    const product = memoryUtils.product
+    this.isUpdate = !!product._id
     this.product = product || {}
+  }
+
+  componentWillUnmount() {
+    memoryUtils.product = {}
   }
   
   render() {
